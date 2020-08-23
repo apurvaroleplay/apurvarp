@@ -5,7 +5,7 @@ name 'Monster Vault'
 description 'An Vault script built for Monster ESX Framework - A Monster ESX Framework built for MonsterSrRP NOHD Nightmare'
 author 'TaerAttO'
 version 'v1.0.0'
-url 'https://discord.gg/taeratto'
+url 'https://discord.io/secretTH'
 
 server_scripts {
 	'@es_extended/locale.lua',
@@ -26,8 +26,7 @@ dependencies {
 	'es_extended',
 	'esx_addonaccount',
 	'esx_addoninventory',
-	'esx_datastore',
-	'mythic_notify'
+	'esx_datastore'
 }
 
 exports {

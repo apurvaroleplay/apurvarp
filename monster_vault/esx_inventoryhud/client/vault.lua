@@ -43,7 +43,7 @@ function setVaultInventoryData(inventory)
             name = "black_money",
             usable = false,
             rare = false,
-            weight = -1,
+            limit = -1,
             canRemove = false
         }
         table.insert(items, accountData)
@@ -56,7 +56,7 @@ function setVaultInventoryData(inventory)
             item.type = "item_standard"
             item.usable = false
             item.rare = false
-            item.weight = -1
+            item.limit = -1
             item.canRemove = false
 
             table.insert(items, item)
@@ -72,7 +72,7 @@ function setVaultInventoryData(inventory)
                 {
                     label = ESX.GetWeaponLabel(weapon.name),
                     count = weapon.ammo or weapon.count,
-                    weight = -1,
+                    limit = -1,
                     type = "item_weapon",
                     name = weapon.name,
                     usable = false,
