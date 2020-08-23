@@ -33,14 +33,14 @@ AddEventHandler('esx:setJob', function(job)
 end)
 
 function OpenVaultInventoryMenu(data)
-	if data.job == ESX.PlayerData.job.name or data.job == 'vault' or data.job == 'fridge'  then
+	if data.job == ESX.PlayerData.job.name or data.job == 'vault' then
 		print(data.needItemLicense)
 		vaultType = data
 		ESX.TriggerServerCallback(
 			"monster_vault:getVaultInventory",
 			function(inventory)
 				if not inventory then
-					exports['mythic_notify']:DoCustomHudText('error', 'Anda tidak memiliki lisensi', 5500)
+					exports['mythic_notify']:SendAlert('error', 'Not have license card')
 				else
 					TriggerEvent("monster_inventoryhud:openVaultInventory", inventory)
 				end
@@ -48,7 +48,7 @@ function OpenVaultInventoryMenu(data)
 			data
 		)
 	else
-		exports['mythic_notify']:DoCustomHudText('error', 'Anda Tidak memiliki akses', 5500)
+		exports['mythic_notify']:SendAlert('error', "you not have permission for this job", 5500)
 		Citizen.Wait(8000)
 	end
 end
@@ -75,8 +75,8 @@ Citizen.CreateThread(function()
 		local coords = GetEntityCoords(PlayerPedId())
 		for k,v in pairs(Config.Vault) do
 			local dist = GetDistanceBetweenCoords(coords, v.coords, true)
-			if dist < 1 then
-				ESX.ShowHelpNotification("~b~Press [E] To Open ~b~")
+			if dist < 2 then
+				ESX.ShowHelpNotification("Press E to "..k)
 				
 				if IsControlJustReleased(0, Keys['E']) then
 					OpenVaultInventoryMenu({job = k, needItemLicense = v.needItemLicense, InfiniteLicense = v.InfiniteLicense})

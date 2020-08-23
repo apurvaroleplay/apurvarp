@@ -13,10 +13,10 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 		local sourceItem = xPlayer.getInventoryItem(item)
 
 		if xPlayer.job.name == job then
-			TriggerEvent('esx_addoninventory:getSharedInventory', function(inventory)
+			TriggerEvent('esx_addoninventory:getSharedInventory', 'society_'..job, function(inventory)
 				local inventoryItem = inventory.getItem(item)
 				if count > 0 and inventoryItem.count >= count then
-					if sourceItem.limit ~= -1 and (sourceItem.count + count) > sourceItem.limit then
+					if sourceItem.weight ~= -1 and (sourceItem.count + count) > sourceItem.weight then
 						print('notify: player cannot hold')
 						TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = _U('player_cannot_hold'), length = 5500})
 					else
@@ -29,15 +29,13 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 					TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = _U('not_enough_in_vault'), length = 5500})
 				end
 			end)
-		elseif job == 'vault' or 'fridge' then
+		elseif job == 'vault' then
 			TriggerEvent('esx_addoninventory:getInventory', 'vault', xPlayerOwner.identifier, function(inventory)
 				local inventoryItem = inventory.getItem(item)
-			   
-		
 	
 				
 				if count > 0 and inventoryItem.count >= count then
-					if sourceItem.limit ~= -1 and (sourceItem.count + count) > sourceItem.limit then
+					if sourceItem.weight ~= -1 and (sourceItem.count + count) > sourceItem.weight then
 						TriggerClientEvent('mythic_notify:client:SendAlert', _source,  {type = 'error', text = _U('player_cannot_hold'), length = 5500})
 					else
 						inventory.removeItem(item, count)
@@ -54,7 +52,7 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 
 	elseif type == 'item_account' then
 		if xPlayer.job.name == job then
-			TriggerEvent('esx_addonaccount:getSharedAccount', '_'..item, function(account)
+			TriggerEvent('esx_addonaccount:getSharedAccount', 'society_'..job..'_'..item, function(account)
 				local policeAccountMoney = account.money
 
 				if policeAccountMoney >= count then
@@ -64,7 +62,7 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 					TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = _U('amount_invalid'), length = 5500})
 				end
 			end)
-		elseif job == 'vault' or 'fridge' then
+		elseif job == 'vault' then
 			TriggerEvent('esx_addonaccount:getAccount', 'vault_' .. item, xPlayerOwner.identifier, function(account)
 				local roomAccountMoney = account.money
 	
@@ -76,9 +74,9 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 				end
 			end)
 		else
-			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = "Rütben yetmiyor..", length = 5500})
+			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = "You not have permission", length = 5500})
 		end
-    elseif type == 'item_weapon' then
+	elseif type == 'item_weapon' then
 		if xPlayer.job.name == job then
 			TriggerEvent('esx_datastore:getSharedDataStore', 'society_'..job, function(store)
 				local storeWeapons = store.get('weapons') or {}
@@ -98,7 +96,7 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 				store.set('weapons', storeWeapons)
 				xPlayer.addWeapon(weaponName, ammo)
 			end)
-		elseif job == 'vault' or 'fridge' then
+		elseif job == 'vault' then
 			TriggerEvent('esx_datastore:getDataStore', 'vault', xPlayerOwner.identifier, function(store)
 				local storeWeapons = store.get('weapons') or {}
 				local weaponName   = nil
@@ -118,7 +116,7 @@ AddEventHandler('monster_vault:getItem', function(--[[owner,--]] job, type, item
 				xPlayer.addWeapon(weaponName, ammo)
 			end)
 		else
-			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = 'Rütben yetmez...', length = 5500})
+			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = 'You not have permission', length = 5500})
 		end
 	end
 
@@ -142,14 +140,14 @@ AddEventHandler('monster_vault:putItem', function(--[[owner,--]] job, type, item
 					TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'success', text = _U('have_deposited', count, inventory.getItem(item).label), length = 7500})
 				end)
 				-- print("monster_vault:putItem")
-			elseif job == 'vault' or 'fridge' then
+			elseif job == 'vault' then
 				TriggerEvent('esx_addoninventory:getInventory', 'vault', xPlayerOwner.identifier, function(inventory)
 					xPlayer.removeInventoryItem(item, count)
 					inventory.addItem(item, count)
 					TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'success', text = _U('have_deposited', count, inventory.getItem(item).label), length = 7500})
 				end)
 			else
-				TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = "error", text = 'Bu iş icin izniniz yok!', length = 5500})
+				TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = "error", text = 'You not have permission for this job!', length = 5500})
 			end
 		else
 			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = "error", text = _U('invalid_quantity'), length = 5500})
@@ -165,13 +163,13 @@ AddEventHandler('monster_vault:putItem', function(--[[owner,--]] job, type, item
 				TriggerEvent('esx_addonaccount:getSharedAccount', 'society_'..job..'_'..item, function(account)
 					account.addMoney(count)
 				end)
-			elseif job == 'vault' or 'fridge' then
+			elseif job == 'vault' then
 				TriggerEvent('esx_addonaccount:getAccount', 'vault_' .. item, xPlayerOwner.identifier, function(account)
 					account.addMoney(count)
 				end)
 			else
 				xPlayer.addAccountMoney(item, count)
-				TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = 'Kara Para İzin Vermiyor..', length = 5500})
+				TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = 'This job not allow for black money', length = 5500})
 			end
 			
 		else
@@ -192,7 +190,7 @@ AddEventHandler('monster_vault:putItem', function(--[[owner,--]] job, type, item
 				store.set('weapons', storeWeapons)
 				
 			end)
-		elseif job == 'vault' or 'fridge' then
+		elseif job == 'vault' then
 			TriggerEvent('esx_datastore:getDataStore', 'vault', xPlayerOwner.identifier, function(store)
 				local storeWeapons = store.get('weapons') or {}
 	
@@ -206,7 +204,7 @@ AddEventHandler('monster_vault:putItem', function(--[[owner,--]] job, type, item
 				
 			end)
 		else
-			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = 'Rütben yok', length = 5500})
+			TriggerClientEvent('mythic_notify:client:SendAlert', _source, {type = 'error', text = 'You not have permission', length = 5500})
 		end
 	end
 
@@ -227,20 +225,20 @@ ESX.RegisterServerCallback('monster_vault:getVaultInventory', function(source, c
 	local items      = {}
 	local weapons    = {}
 
-	if not refresh and (item.needItemLicense ~= '' or item.needItemLicense ~= nil) and xItem ~= nil then
-		if xItem.count < 1 then
-			cb(false)
-		end
+	if not refresh and (item.needItemLicense ~= '' or item.needItemLicense ~= nil) and xItem ~= nil and xItem.count < 1 then
+		-- if xItem.count < 1 then
+		cb(false)
+		-- end
 		-- return
-	elseif item.InfiniteLicense ~= nil and not refresh and (item.needItemLicense ~= '' or item.needItemLicense ~= nil)  then
-		if not item.InfiniteLicense then
+	elseif not item.InfiniteLicense and not refresh and xItem ~= nil and xItem.count > 0 then
+		-- if not item.InfiniteLicense then
 			xPlayer.removeInventoryItem(item.needItemLicense, 1)
-		end
+		-- end
 	end
 
-	if item.job == xPlayer.job.name then
-		print('u job: '..xPlayer.job.name)
-	end
+	-- if item.job == xPlayer.job.name then
+	-- 	print('u job: '..xPlayer.job.name)
+	-- end
 
 	local typeVault = ''
 	local society = false
@@ -250,7 +248,7 @@ ESX.RegisterServerCallback('monster_vault:getVaultInventory', function(source, c
 		typeVault = "society_"..item.job
 		society = true
 	end
-	print("vault: "..typeVault)
+	print("Vault: "..typeVault)
 
 	if society then
 		if item.job == 'police' then
